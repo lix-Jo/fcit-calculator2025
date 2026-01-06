@@ -26,11 +26,11 @@ const KAUCalculator = () => {
   const pastWeighted = [
     { batch: "21", female: { CS: 4.67, IT: 4.44, IS: 4.44 }, male: { CS: 4.58, IT: 4.37, IS: 4.36 } },
     { batch: "21.5", female: { CS: 4.60, IT: 4.45, IS: 4.45 }, male: { CS: "-", IT: "-", IS: "-" } },
-    { batch: "22", female: { CS: 89, IT: 88, IS: "<88" }, male: { CS: 88.89, IT: 85, IS: 73.6 } },
-    { batch: "22.5", female: { CS: ">87", IT: "≈87", IS: "<87" }, male: { CS: "-", IT: "-", IS: "-" } },
-    { batch: "23", female: { CS: 94.81, IT: 91, IS: "<91" }, male: { CS: 90, IT: 83, IS: "<83" } },
-    { batch: "23.5", female: { CS: 97.50, IT: 92.70, IS: 72.18 }, male: { CS: 90, IT: 83, IS: "<83" } },
-    { batch: "24", female: { CS: 93.82, IT: 88, IS: "<88" }, male: { CS: 90.24, IT: 83.2, IS: 71.18 } }
+    { batch: "22", female: { CS: 89, IT: 88, IS: "اقل من 88" }, male: { CS: 88.89, IT: 85, IS: 73.6 } },
+    { batch: "22.5", female: { CS: "اعلى من 87", IT: "≈87", IS: "اقل من 87" }, male: { CS: "-", IT: "-", IS: "-" } },
+    { batch: "23", female: { CS: 94.81, IT: 91, IS: "اقل من 91" }, male: { CS: 90, IT: 83, IS: "اقل من 83" } },
+    { batch: "23.5", female: { CS: 97.50, IT: 92.70, IS: 72.18 }, male: { CS: 90, IT: 83, IS: "اقل من 83" } },
+    { batch: "24", female: { CS: 93.82, IT: 88, IS: "اقل من 88" }, male: { CS: 90.24, IT: 83.2, IS: 71.18 } }
   ];
 
   // --- Functions (الدوال) ---
@@ -83,6 +83,7 @@ const KAUCalculator = () => {
 
   // دوال حساب المعدل
   const addCourse = () => {
+    // القيمة الافتراضية للساعات جعلناها 3
     setCourses([...courses, { id: Date.now(), grade: "A+", hours: 3 }]);
   };
 
@@ -190,10 +191,17 @@ const KAUCalculator = () => {
                               ))}
                             </select>
                           </div>
+                          
+                          {/* التعديل هنا: تحويل الساعات لقائمة منسدلة */}
                           <div className="input-group" style={{ marginBottom: 0 }}>
                             <label className="input-label">الساعات</label>
-                            <input type="number" className="input-field" value={course.hours} min="1" max="6" onChange={(e) => updateCourse(course.id, 'hours', e.target.value)} />
+                            <select value={course.hours} onChange={(e) => updateCourse(course.id, 'hours', e.target.value)}>
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                                <option key={num} value={num}>{num}</option>
+                              ))}
+                            </select>
                           </div>
+
                           <button className="btn-danger" onClick={() => deleteCourse(course.id)}>حذف</button>
                         </div>
                       </div>
@@ -204,7 +212,7 @@ const KAUCalculator = () => {
                 <button className="btn-secondary" onClick={addCourse} style={{ width: '100%', marginBottom: '15px' }}>+ إضافة مادة</button>
                 <button className="btn-primary" onClick={calculateGPA}>احسب المعدل</button>
                 
-                {gpaResult && <div className="result-box">معدلك التراكمي: {gpaResult} من 5.00</div>}
+                {gpaResult && <div className="result-box">معدلك الفصلي: {gpaResult} من 5.00</div>}
               </div>
             </div>
           )}
@@ -254,7 +262,7 @@ const KAUCalculator = () => {
 
           {/* الفوتر */}
           <footer className="footer">
-            في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل مع : <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a>
+            في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل معي: <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a>
           </footer>
         </div>
       </div>
