@@ -174,7 +174,7 @@ const KAUCalculator = () => {
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
               <div className="calculator-card">
-                <h2 className="card-title">حساب المعدل التراكمي</h2>
+                <h2 className="card-title">حساب المعدل الفصلي</h2>
                 
                 <div id="coursesList">
                   {courses.length === 0 ? (
