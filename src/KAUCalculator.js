@@ -262,7 +262,7 @@ const KAUCalculator = () => {
 
           {/* الفوتر */}
           <footer className="footer">
-            في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل معي: <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a>
+            في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل مع: <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a>
           </footer>
         </div>
       </div>
