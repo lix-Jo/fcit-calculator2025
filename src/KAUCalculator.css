@@ -1,4 +1,4 @@
-/* استيراد خط "تجوّل" */
+
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
 * {
@@ -8,11 +8,10 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #121212; /* رمادي غامق جداً للخلفية */
+  background-color: #121212;
   font-family: 'Tajawal', sans-serif;
 }
 
-/* توسيط التطبيق بالكامل في الشاشة */
 .app-wrapper {
   display: flex;
   justify-content: center;
@@ -24,19 +23,19 @@ body {
 
 /* الكارد الأساسي */
 .calculator-card {
-  background-color: #1e1e1e; /* رمادي غامق للكارد */
+  background-color: #1e1e1e; 
   width: 100%;
   max-width: 500px;
   border: 1px solid #333;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); /* ظل ناعم */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  border-radius: 15px; /* انحناء ناعم للحواف */
+  border-radius: 15px; 
 }
 
 /* الهيدر*/
 .main-title, .card-title {
   background-color: #b6b5b8; 
-  background: linear-gradient(135deg, #72888b, #688387); /* تدرج بنفسجي جميل */
+  background: linear-gradient(135deg, #72888b, #688387); 
   color: #ffffff;
   padding: 30px 30px;
   margin: 0;
