@@ -33,7 +33,7 @@ const KAUCalculator = () => {
     { batch: "24", female: { CS: 93.82, IT: 88, IS: "اقل من 88" }, male: { CS: 90.24, IT: 83.2, IS: 71.18 } }
   ];
 
-  // --- Functions (الدوال) ---
+  // Functions (الدوال)
 
   const handleBack = () => {
     setMode('menu');
