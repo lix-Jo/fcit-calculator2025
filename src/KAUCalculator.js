@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './KAUCalculator.css'; // استدعاء ملف الستايل
+import './KAUCalculator.css; 
 
 const KAUCalculator = () => {
   // --- States (الحالات) ---
@@ -10,7 +10,7 @@ const KAUCalculator = () => {
   const [weightedResult, setWeightedResult] = useState(null);
   const [weightedError, setWeightedError] = useState('');
 
-  // حالات حساب المعدل التراكمي
+  // حالات حساب المعدلل
   const [courses, setCourses] = useState([]);
   const [gpaResult, setGpaResult] = useState(null);
 
@@ -57,7 +57,6 @@ const KAUCalculator = () => {
       return;
     }
     
-    // التحقق من اكتمال القيم
     const filledCount = [programming, intro, statistics, writing].filter(val => val !== '').length;
     if (filledCount < 4) {
       setWeightedError('تأكد من إدخال جميع الدرجات');
@@ -65,7 +64,6 @@ const KAUCalculator = () => {
       return;
     }
 
-    // التحقق من صحة الأرقام
     for (let val of [programming, intro, statistics, writing]) {
       const num = Number(val);
       if (isNaN(num) || num < 0 || num > 100) {
@@ -83,7 +81,6 @@ const KAUCalculator = () => {
 
   // دوال حساب المعدل
   const addCourse = () => {
-    // القيمة الافتراضية للساعات جعلناها 3
     setCourses([...courses, { id: Date.now(), grade: "A+", hours: 3 }]);
   };
 
@@ -192,7 +189,7 @@ const KAUCalculator = () => {
                             </select>
                           </div>
                           
-                          {/* التعديل هنا: تحويل الساعات لقائمة منسدلة */}
+                          {/* التعديل هنا: تحويل الساعات لقائمة  */}
                           <div className="input-group" style={{ marginBottom: 0 }}>
                             <label className="input-label">الساعات</label>
                             <select value={course.hours} onChange={(e) => updateCourse(course.id, 'hours', e.target.value)}>
@@ -222,7 +219,7 @@ const KAUCalculator = () => {
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
               <div className="calculator-card">
-                <h2 className="card-title">موزونات السنوات السابقة</h2>
+                <h2 className="card-title">موزونات الاعوام السابقة</h2>
                 
                 <div className="gender-selector">
                   <button className={`gender-btn ${gender === 'female' ? 'active' : ''}`} onClick={() => setGender('female')}>طالبات</button>
@@ -262,7 +259,7 @@ const KAUCalculator = () => {
 
           {/* الفوتر */}
           <footer className="footer">
-            في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل مع: <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a>
+           <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">vega</a> : في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل مع
           </footer>
         </div>
       </div>
