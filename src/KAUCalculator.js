@@ -29,6 +29,7 @@ const KAUCalculator = () => {
     { batch: "23", female: { CS: 94.81, IT: 91, IS: "اقل من 91" }, male: { CS: 90, IT: 83, IS: "اقل من 83" } },
     { batch: "23.5", female: { CS: 97.50, IT: 92.70, IS: 72.18 }, male: { CS: 90, IT: 83, IS: "اقل من 83" } },
     { batch: "24", female: { CS: 93.82, IT: 88, IS: "اقل من 88" }, male: { CS: 90.24, IT: 83.2, IS: 71.18 } }
+    { batch: "24.5", female: { CS: "-", IT: "-", IS: "-" }, male: { CS: 90.68, IT: 82, IS: 73 } }
   ];
 
   // --- Functions ---
