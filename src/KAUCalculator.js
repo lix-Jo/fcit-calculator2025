@@ -20,7 +20,7 @@ const KAUCalculator = () => {
     "C+": 3.5, "C": 3.0, "D+": 2.5, "D": 2.0, "F": 0
   };
 
-  // بيانات السنوات السابقة (شاملة الانصاص)
+  // Historical minimum acceptance weighted tracks (including mid-year batches)
   const pastWeighted = [
     { batch: "21", female: { CS: 4.67, IT: 4.44, IS: 4.44 }, male: { CS: 4.58, IT: 4.37, IS: 4.36 } },
     { batch: "21.5", female: { CS: 4.60, IT: 4.45, IS: 4.45 }, male: { CS: "-", IT: "-", IS: "-" } },
@@ -30,6 +30,7 @@ const KAUCalculator = () => {
     { batch: "23.5", female: { CS: 97.50, IT: 92.70, IS: 72.18 }, male: { CS: 90, IT: 83, IS: "اقل من 83" } },
     { batch: "24", female: { CS: 93.82, IT: 88, IS: "اقل من 88" }, male: { CS: 90.24, IT: 83.2, IS: 71.18 } },
     { batch: "24.5", female: { CS: "-", IT: "-", IS: "-" }, male: { CS: 90.68, IT: 82, IS: 73 } },
+    { batch: "25", female: { CS: 94.03, IT: 83.82, IS: "اقل من 83.82" }, male: { CS: 90.11, IT: 87, IS: 76.36 } },
   ];
 
   // --- Functions ---
@@ -47,13 +48,14 @@ const KAUCalculator = () => {
   const calculateWeighted = () => {
     const { programming, intro, statistics, writing } = weightedInputs;
     
-    
+    // Check if all fields are empty
     if (!programming && !intro && !statistics && !writing) {
       setWeightedError('لا توجد قيم مدخلة، يرجى إدخال الدرجات');
       setWeightedResult(null);
       return;
     }
 
+    // Validate that all 4 fields are filled
     const filledCount = [programming, intro, statistics, writing].filter(val => val !== '').length;
     if (filledCount < 4) {
       setWeightedError('تأكد من إدخال جميع الدرجات');
@@ -61,7 +63,7 @@ const KAUCalculator = () => {
       return;
     }
 
- 
+    // Validate ranges (0 - 100)
     for (let val of [programming, intro, statistics, writing]) {
       const num = Number(val);
       if (isNaN(num) || num < 0 || num > 100) {
@@ -71,6 +73,7 @@ const KAUCalculator = () => {
       }
     }
 
+    // Calculation logic based on KAU FCIT credit weights (Total credits = 11)
     const total = Number(programming) * 3 + Number(intro) * 3 + Number(statistics) * 3 + Number(writing) * 2;
     setWeightedResult((total / 11).toFixed(2));
     setWeightedError('');
@@ -115,7 +118,7 @@ const KAUCalculator = () => {
 
         <div className="card-content">
           
-          {/* القائمة الرئيسية */}
+          {/* Main Menu Mode */}
           {mode === 'menu' && (
             <div className="mode-selector" style={{flexDirection: 'column'}}>
               <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('gpa')}>حساب المعدل الفصلي</button>
@@ -124,7 +127,7 @@ const KAUCalculator = () => {
             </div>
           )}
 
-          {/* حاسبة الموزونة */}
+          {/* Weighted Track Calculator Mode */}
           {mode === 'weighted' && (
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
@@ -161,7 +164,7 @@ const KAUCalculator = () => {
             </div>
           )}
 
-          {/* حاسبة المعدل */}
+          {/* GPA Calculator Mode */}
           {mode === 'gpa' && (
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
@@ -203,7 +206,7 @@ const KAUCalculator = () => {
             </div>
           )}
 
-          {/* موزونة الأعوام السابقة */}
+          {/* Historical Data Mode */}
           {mode === 'past' && (
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
@@ -243,7 +246,7 @@ const KAUCalculator = () => {
             </div>
           )}
 
-          {/* الفوتر */}
+          {/* Footer Component */}
           <footer className="footer">
             في حال واجهتك مشكلة أو تود إضافة ملاحظة تواصل مع: <a href="https://t.me/LIX_JI" target="_blank" rel="noopener noreferrer" className="footer-link">Vega</a>
           </footer>
