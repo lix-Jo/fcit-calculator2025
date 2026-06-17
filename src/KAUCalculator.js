@@ -10,7 +10,10 @@ const KAUCalculator = () => {
   const [weightedError, setWeightedError] = useState('');
 
   const [courses, setCourses] = useState([]);
+  const [pastGpa, setPastGpa] = useState('');
+  const [pastHours, setPastHours] = useState('');
   const [gpaResult, setGpaResult] = useState(null);
+  const [cumulativeResult, setCumulativeResult] = useState(null);
 
   const [gender, setGender] = useState('female');
 
@@ -39,6 +42,9 @@ const KAUCalculator = () => {
     setWeightedResult(null);
     setWeightedError('');
     setGpaResult(null);
+    setCumulativeResult(null);
+    setPastGpa('');
+    setPastHours('');
   };
 
   const handleWeightedChange = (e) => {
@@ -95,15 +101,38 @@ const KAUCalculator = () => {
 
   const calculateGPA = () => {
     if (courses.length === 0) return;
-    let totalPoints = 0;
-    let totalHours = 0;
+    
+    let currentPoints = 0;
+    let currentHours = 0;
+    
     courses.forEach(course => {
       const points = gradePoints[course.grade] || 0;
-      totalPoints += points * course.hours;
-      totalHours += course.hours;
+      currentPoints += points * course.hours;
+      currentHours += course.hours;
     });
-    if (totalHours === 0) return;
-    setGpaResult((totalPoints / totalHours).toFixed(2));
+    
+    if (currentHours === 0) return;
+    
+    // حساب المعدل الفصلي الحالي
+    const termGpa = currentPoints / currentHours;
+    setGpaResult(termGpa.toFixed(2));
+
+    // حساب المعدل التراكمي في حال إدخال البيانات السابقة
+    if (pastGpa && pastHours) {
+      const pGpa = Number(pastGpa);
+      const pHours = Number(pastHours);
+      
+      if (!isNaN(pGpa) && !isNaN(pHours) && pGpa >= 0 && pGpa <= 5 && pHours >= 0) {
+        const pastPoints = pGpa * pHours;
+        const totalPoints = pastPoints + currentPoints;
+        const totalHours = pHours + currentHours;
+        setCumulativeResult((totalPoints / totalHours).toFixed(2));
+      } else {
+        setCumulativeResult(null);
+      }
+    } else {
+      setCumulativeResult(null);
+    }
   };
 
   // --- JSX ---
@@ -121,7 +150,7 @@ const KAUCalculator = () => {
           {/* Main Menu Mode */}
           {mode === 'menu' && (
             <div className="mode-selector" style={{flexDirection: 'column'}}>
-              <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('gpa')}>حساب المعدل الفصلي</button>
+              <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('gpa')}>حساب المعدل الفصلي والتراكمي</button>
               <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('weighted')}>حساب الموزونة</button>
               <button className="mode-btn active" onClick={() => setMode('past')}>موزونة الأعوام السابقة</button>
             </div>
@@ -141,7 +170,7 @@ const KAUCalculator = () => {
                 <input type="number" name="intro" className="input-field" placeholder="أدخل الدرجة" value={weightedInputs.intro} onChange={handleWeightedChange} />
               </div>
               <div className="input-group">
-                <label className="input-label">الإحصاء (3 ساعات)</label>
+                <label className="input-label">إحصاء (3 ساعات)</label>
                 <input type="number" name="statistics" className="input-field" placeholder="أدخل الدرجة" value={weightedInputs.statistics} onChange={handleWeightedChange} />
               </div>
               <div className="input-group">
@@ -168,10 +197,22 @@ const KAUCalculator = () => {
           {mode === 'gpa' && (
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
+
+              {/* حقول المعدل التراكمي السابق والساعات السابقة */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px dashed #ccc', paddingBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="input-label">المعدل التراكمي السابق (اختياري)</label>
+                  <input type="number" min="0" max="5" step="0.01" className="input-field" placeholder="من 5.00" value={pastGpa} onChange={(e) => setPastGpa(e.target.value)} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="input-label">إجمالي الساعات السابقة (اختياري)</label>
+                  <input type="number" min="0" className="input-field" placeholder="عدد الساعات المكتسبة" value={pastHours} onChange={(e) => setPastHours(e.target.value)} />
+                </div>
+              </div>
               
               <div id="coursesList">
                 {courses.length === 0 ? (
-                  <p style={{ textAlign: 'center', color: '#6c757d', padding: '20px' }}>لا توجد مواد. اضغط على "إضافة مادة" للبدء.</p>
+                  <p style={{ textAlign: 'center', color: '#6c757d', padding: '20px' }}>لا توجد مواد للترم الحالي. اضغط على "إضافة مادة" للبدء.</p>
                 ) : (
                   courses.map((course) => (
                     <div key={course.id} style={{ display: 'flex', gap: '10px', alignItems: 'end', marginBottom: '10px' }}>
@@ -202,7 +243,18 @@ const KAUCalculator = () => {
               <button className="btn-secondary" onClick={addCourse}>+ إضافة مادة</button>
               <button className="btn-primary" onClick={calculateGPA}>احسب المعدل</button>
               
-              {gpaResult && <div className="result-box">معدلك الفصلي: {gpaResult} من 5.00</div>}
+              {gpaResult && (
+                <div style={{ marginTop: '15px' }}>
+                  <div className="result-box" style={{ marginBottom: cumulativeResult ? '10px' : '0px' }}>
+                    معدلك الفصلي: {gpaResult} من 5.00
+                  </div>
+                  {cumulativeResult && (
+                    <div className="result-box" style={{ backgroundColor: '#28a745', borderColor: '#24923d' }}>
+                      معدلك التراكمي الجديد: {cumulativeResult} من 5.00
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
