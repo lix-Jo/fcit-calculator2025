@@ -3,7 +3,7 @@ import './KAUCalculator.css';
 
 const KAUCalculator = () => {
   // --- States ---
-  const [mode, setMode] = useState('menu'); // menu, weighted, gpa, past
+  const [mode, setMode] = useState('menu'); // menu, weighted, gpa, cumulative, past
   
   const [weightedInputs, setWeightedInputs] = useState({ programming: '', intro: '', statistics: '', writing: '' });
   const [weightedResult, setWeightedResult] = useState(null);
@@ -45,6 +45,7 @@ const KAUCalculator = () => {
     setCumulativeResult(null);
     setPastGpa('');
     setPastHours('');
+    setCourses([]);
   };
 
   const handleWeightedChange = (e) => {
@@ -54,14 +55,12 @@ const KAUCalculator = () => {
   const calculateWeighted = () => {
     const { programming, intro, statistics, writing } = weightedInputs;
     
-    // Check if all fields are empty
     if (!programming && !intro && !statistics && !writing) {
       setWeightedError('لا توجد قيم مدخلة، يرجى إدخال الدرجات');
       setWeightedResult(null);
       return;
     }
 
-    // Validate that all 4 fields are filled
     const filledCount = [programming, intro, statistics, writing].filter(val => val !== '').length;
     if (filledCount < 4) {
       setWeightedError('تأكد من إدخال جميع الدرجات');
@@ -69,7 +68,6 @@ const KAUCalculator = () => {
       return;
     }
 
-    // Validate ranges (0 - 100)
     for (let val of [programming, intro, statistics, writing]) {
       const num = Number(val);
       if (isNaN(num) || num < 0 || num > 100) {
@@ -79,7 +77,6 @@ const KAUCalculator = () => {
       }
     }
 
-    // Calculation logic based on KAU FCIT credit weights (Total credits = 11)
     const total = Number(programming) * 3 + Number(intro) * 3 + Number(statistics) * 3 + Number(writing) * 2;
     setWeightedResult((total / 11).toFixed(2));
     setWeightedError('');
@@ -99,40 +96,51 @@ const KAUCalculator = () => {
     setCourses(courses.filter(course => course.id !== id));
   };
 
+  // دالة حساب المعدل الفصلي فقط
   const calculateGPA = () => {
     if (courses.length === 0) return;
-    
+    let totalPoints = 0;
+    let totalHours = 0;
+    courses.forEach(course => {
+      const points = gradePoints[course.grade] || 0;
+      totalPoints += points * course.hours;
+      totalHours += course.hours;
+    });
+    if (totalHours === 0) return;
+    setGpaResult((totalPoints / totalHours).toFixed(2));
+  };
+
+  // دالة حساب المعدل التراكمي الجديد
+  const calculateCumulative = () => {
+    if (courses.length === 0) return;
+    if (!pastGpa || !pastHours) {
+      alert("الرجاء إدخال المعدل التراكمي السابق وعدد الساعات السابقة");
+      return;
+    }
+
     let currentPoints = 0;
     let currentHours = 0;
-    
     courses.forEach(course => {
       const points = gradePoints[course.grade] || 0;
       currentPoints += points * course.hours;
       currentHours += course.hours;
     });
-    
-    if (currentHours === 0) return;
-    
-    // حساب المعدل الفصلي الحالي
-    const termGpa = currentPoints / currentHours;
-    setGpaResult(termGpa.toFixed(2));
 
-    // حساب المعدل التراكمي في حال إدخال البيانات السابقة
-    if (pastGpa && pastHours) {
-      const pGpa = Number(pastGpa);
-      const pHours = Number(pastHours);
-      
-      if (!isNaN(pGpa) && !isNaN(pHours) && pGpa >= 0 && pGpa <= 5 && pHours >= 0) {
-        const pastPoints = pGpa * pHours;
-        const totalPoints = pastPoints + currentPoints;
-        const totalHours = pHours + currentHours;
-        setCumulativeResult((totalPoints / totalHours).toFixed(2));
-      } else {
-        setCumulativeResult(null);
-      }
-    } else {
-      setCumulativeResult(null);
+    if (currentHours === 0) return;
+
+    const pGpa = Number(pastGpa);
+    const pHours = Number(pastHours);
+
+    if (isNaN(pGpa) || pGpa < 0 || pGpa > 5 || isNaN(pHours) || pHours < 0) {
+      alert("تأكد من صحة البيانات المدخلة للمعدل والساعات السابقة");
+      return;
     }
+
+    const pastPoints = pGpa * pHours;
+    const totalPoints = pastPoints + currentPoints;
+    const totalHours = pHours + currentHours;
+    
+    setCumulativeResult((totalPoints / totalHours).toFixed(2));
   };
 
   // --- JSX ---
@@ -150,7 +158,8 @@ const KAUCalculator = () => {
           {/* Main Menu Mode */}
           {mode === 'menu' && (
             <div className="mode-selector" style={{flexDirection: 'column'}}>
-              <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('gpa')}>حساب المعدل الفصلي والتراكمي</button>
+              <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('gpa')}>حساب المعدل الفصلي</button>
+              <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('cumulative')}>حساب المعدل التراكمي</button>
               <button className="mode-btn active" style={{marginBottom: '10px'}} onClick={() => setMode('weighted')}>حساب الموزونة</button>
               <button className="mode-btn active" onClick={() => setMode('past')}>موزونة الأعوام السابقة</button>
             </div>
@@ -193,24 +202,67 @@ const KAUCalculator = () => {
             </div>
           )}
 
-          {/* GPA Calculator Mode */}
+          {/* GPA Calculator Mode (الفصلي فقط) */}
           {mode === 'gpa' && (
             <div>
               <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
+              
+              <div id="coursesList">
+                {courses.length === 0 ? (
+                  <p style={{ textAlign: 'center', color: '#6c757d', padding: '20px' }}>لا توجد مواد. اضغط على "إضافة مادة" للبدء.</p>
+                ) : (
+                  courses.map((course) => (
+                    <div key={course.id} style={{ display: 'flex', gap: '10px', alignItems: 'end', marginBottom: '10px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label className="input-label" style={{fontSize: '0.8rem'}}>التقدير</label>
+                        <select className="input-field" value={course.grade} onChange={(e) => updateCourse(course.id, 'grade', e.target.value)}>
+                          {Object.keys(gradePoints).map(grade => (
+                            <option key={grade} value={grade}>{grade}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div style={{ flex: 1 }}>
+                        <label className="input-label" style={{fontSize: '0.8rem'}}>الساعات</label>
+                        <select className="input-field" value={course.hours} onChange={(e) => updateCourse(course.id, 'hours', e.target.value)}>
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                            <option key={num} value={num}>{num}</option>
+                          ))}
+                        </select>
+                      </div>
 
-              {/* حقول المعدل التراكمي السابق والساعات السابقة */}
+                      <button className="btn-danger" onClick={() => deleteCourse(course.id)}>حذف</button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <button className="btn-secondary" onClick={addCourse}>+ إضافة مادة</button>
+              <button className="btn-primary" onClick={calculateGPA}>احسب المعدل الفصلي</button>
+              
+              {gpaResult && <div className="result-box">معدلك الفصلي: {gpaResult} من 5.00</div>}
+            </div>
+          )}
+
+          {/* Cumulative Calculator Mode (التراكمي) */}
+          {mode === 'cumulative' && (
+            <div>
+              <button className="back-btn" onClick={handleBack}>← العودة للقائمة</button>
+
+              {/* بيانات التراكمي السابق والساعات السابقة */}
               <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px dashed #ccc', paddingBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label className="input-label">المعدل التراكمي السابق (اختياري)</label>
+                  <label className="input-label">المعدل التراكمي السابق</label>
                   <input type="number" min="0" max="5" step="0.01" className="input-field" placeholder="من 5.00" value={pastGpa} onChange={(e) => setPastGpa(e.target.value)} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label className="input-label">إجمالي الساعات السابقة (اختياري)</label>
-                  <input type="number" min="0" className="input-field" placeholder="عدد الساعات المكتسبة" value={pastHours} onChange={(e) => setPastHours(e.target.value)} />
+                  <label className="input-label">إجمالي الساعات السابقة المكتسبة</label>
+                  <input type="number" min="0" className="input-field" placeholder="أدخل عدد الساعات" value={pastHours} onChange={(e) => setPastHours(e.target.value)} />
                 </div>
               </div>
               
               <div id="coursesList">
+                <p className="input-label" style={{ fontWeight: 'bold', marginBottom: '10px' }}>أضف مواد الترم الحالي وعلاماتها المتوقعة:</p>
                 {courses.length === 0 ? (
                   <p style={{ textAlign: 'center', color: '#6c757d', padding: '20px' }}>لا توجد مواد للترم الحالي. اضغط على "إضافة مادة" للبدء.</p>
                 ) : (
@@ -240,19 +292,12 @@ const KAUCalculator = () => {
                 )}
               </div>
 
-              <button className="btn-secondary" onClick={addCourse}>+ إضافة مادة</button>
-              <button className="btn-primary" onClick={calculateGPA}>احسب المعدل</button>
+              <button className="btn-secondary" onClick={addCourse}>+ إضافة مادة للترم الحالي</button>
+              <button className="btn-primary" onClick={calculateCumulative}>احسب المعدل التراكمي الجديد</button>
               
-              {gpaResult && (
-                <div style={{ marginTop: '15px' }}>
-                  <div className="result-box" style={{ marginBottom: cumulativeResult ? '10px' : '0px' }}>
-                    معدلك الفصلي: {gpaResult} من 5.00
-                  </div>
-                  {cumulativeResult && (
-                    <div className="result-box" style={{ backgroundColor: '#28a745', borderColor: '#24923d' }}>
-                      معدلك التراكمي الجديد: {cumulativeResult} من 5.00
-                    </div>
-                  )}
+              {cumulativeResult && (
+                <div className="result-box" style={{ backgroundColor: '#28a745', borderColor: '#24923d' }}>
+                  معدلك التراكمي الجديد: {cumulativeResult} من 5.00
                 </div>
               )}
             </div>
