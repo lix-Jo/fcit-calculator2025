@@ -256,7 +256,7 @@ const KAUCalculator = () => {
                   <input type="number" min="0" max="5" step="0.01" className="input-field" placeholder="من 5.00" value={pastGpa} onChange={(e) => setPastGpa(e.target.value)} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label className="input-label">إجمالي الساعات السابقة المكتسبة</label>
+                  <label className="input-label">إجمالي الساعات السابقة</label>
                   <input type="number" min="0" className="input-field" placeholder="أدخل عدد الساعات" value={pastHours} onChange={(e) => setPastHours(e.target.value)} />
                 </div>
               </div>
@@ -297,7 +297,7 @@ const KAUCalculator = () => {
               
               {cumulativeResult && (
                 <div className="result-box" style={{ backgroundColor: '#28a745', borderColor: '#24923d' }}>
-                  معدلك التراكمي الجديد: {cumulativeResult} من 5.00
+                  معدلك التراكمي الجديد: {cumulativeResult}
                 </div>
               )}
             </div>
